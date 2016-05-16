@@ -1,4 +1,3 @@
-<script src="sql.js"></script>
 <?php
 include 'header.php';
 
@@ -10,14 +9,14 @@ if ($conn->connect_error) {
 $directory = "sql/";
 
 if ($_POST["uploadform"] == 1) {
-    $dbname = $_POST["dbname"];
-    $dbuser = $_POST["dbusername"];
-    $dbpassword = $_POST["dbpassword"];
-    $createQ = "CREATE USER '{$dbuser}'@'localhost' IDENTIFIED BY '{$dbpassword}'";
-    $grantQ = "GRANT  ALL ON  '{$dbname}' TO '{$dbuser}'@'localhost' WITH GRANT OPTION";
-    $dbcheck = mysql_query("SHOW DATABASES LIKE " . $dbname);
+    $_SESSION["dbname"] = $_POST["dbname"];
+    $_SESSION["dbusername"] = $_POST["dbusername"];
+    $_SESSION["dbpassword"] = $_POST["dbpassword"];
+    $createQ = "CREATE USER '{$_SESSION["dbusername"]}'@'localhost' IDENTIFIED BY '{$_SESSION["dbpassword"]}'";
+    $grantQ = "GRANT  ALL ON  '{$_SESSION["dbname"]}' TO '{$_SESSION["dbusername"]}'@'localhost' WITH GRANT OPTION";
+    $dbcheck = mysql_query("SHOW DATABASES LIKE " . $_SESSION["dbname"]);
     if (empty($dbcheck)) {
-        $sql = "CREATE DATABASE " . $dbname;
+        $sql = "CREATE DATABASE " . $_SESSION["dbname"];
         if ($conn->query($sql) === TRUE) {
             $database_create_success = 'Database Created';
             if ($conn->query($createQ)) {
@@ -39,6 +38,9 @@ if ($_POST["uploadform"] == 1) {
 } else {
     $form_error = 'Form not submitted';
 }
+if (isset($_POST["import"])) {
+    sql_import();
+}
 $conn->close();
 ?>
 <div class="container">
@@ -51,7 +53,7 @@ $conn->close();
         <hr />
 
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-4">
                 <h4 class="page-header"><strong>Step 1:</strong> Upload sql file</h4>
                 <form role="form" action="sqlUpload.php" method="POST" enctype="multipart/form-data">
                     <div class="form-group float-label-control">
@@ -63,15 +65,10 @@ $conn->close();
                     </div>
                 </form>
                 <div>
-                    <?php
-                    if (isset($tmpName) && $tmpName != '') {
-                                echo $tmpName;
-                            }
-                    ?>
                 </div>
             </div>
 
-            <div class="col-sm-8">
+            <div class="col-sm-4">
 
                 <h4 class="page-header"><strong>Step 2:</strong> Database Configurations</h4>
                 <form role="form" action="" method="POST">
@@ -79,11 +76,8 @@ $conn->close();
                     <div class="form-group float-label-control">
                         <label for="">Database Username</label>
                         <input name="dbusername" type="text" class="form-control" placeholder="Username" required>
-                        <label for=""><?php
-                            if (isset($db_user_error) && $db_user_error != '') {
-                                echo $db_user_error;
-                            }
-                            ?></label>
+                        <label for="">
+                        </label>
                     </div>
                     <div class="form-group float-label-control">
                         <label for="">Database Password</label>
@@ -93,10 +87,9 @@ $conn->close();
                         <label for="">Database Name</label>
                         <input name="dbname" type="text" class="form-control" placeholder="Databae Name" required>
                         <label for=""><?php
-                            if (isset($database_exists) && $database_exists != '') {
-                                echo $database_exists;
-                            }
-                            ?></label>
+echo $import_success;
+?>
+                        </label>
                     </div>
 
                     <div class="form-group float-label-control">
@@ -105,29 +98,49 @@ $conn->close();
                 </form>
 
             </div>
+
             <div class="col-sm-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            Features
-                        </h3>
+                <h4 class="page-header"><strong>Step 3:</strong> Import Database</h4>
+                <form role="form" action="" method="POST" enctype="multipart/form-data">
+                    <div class="form-group float-label-control">
+                        <input type="submit" class="btn btn-primary btn-lg btn-block" name="import">
                     </div>
-                    <div class="panel-body">
-                        <ul>
-                            <li>Very customizable</li>
-                            <li>Works with Bootstrap's native form examples</li>
-                            <li>Uses CSS transitions for fallback browser support</li>
-                            <li>Placeholder override for labels when fields are empty</li>
-                            <li>Included authored jQuery plugin</li>
-                            <li>Optional bottom label positioning with the <code>.label-bottom</code> utility</li>
-                            <li>Works great with Chrome's AutoComplete</li>
-                        </ul>
-                    </div>
+                </form>
+                <div>
                 </div>
             </div>
+
         </div>
     </div>
+
 </div>
+<?php
+
+function sql_import() {
+    $filename = "sql/" . $_SESSION["sqlfile"];
+    $mysql_host = 'localhost';
+    $mysql_username = 'root';
+    $mysql_password = '';
+    $mysql_database = $_SESSION["dbname"];
+
+    mysql_connect($mysql_host, $mysql_username, $mysql_password) or die('Error connecting to MySQL server: ' . mysql_error());
+    mysql_select_db($mysql_database) or die('Error selecting MySQL database: ' . mysql_error());
+
+    $templine = '';
+    $lines = file($filename);
+    foreach ($lines as $line) {
+        if (substr($line, 0, 2) == '--' || $line == '')
+            continue;
+
+        $templine .= $line;
+        if (substr(trim($line), -1, 1) == ';') {
+            mysql_query($templine) or print('Error performing query \'<strong>' . $templine . '\': ' . mysql_error() . '<br /><br />');
+            $templine = '';
+        }
+    }
+    $import_success = "Tables imported successfully";
+}
+?>
 <?php
 include 'footer.php';
 ?>

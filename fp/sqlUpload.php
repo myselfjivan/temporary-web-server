@@ -1,7 +1,7 @@
 <?php
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
+    session_start();
     $name = $_FILES['file']['name'];
     $tmpName = $_FILES['file']['tmp_name'];
     $error = $_FILES['file']['error'];
@@ -11,20 +11,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     switch ($error) {
         case UPLOAD_ERR_OK:
             $valid = true;
-            //validate file extensions
             if (!in_array($ext, array('sql'))) {
                 $valid = false;
                 $response = 'Invalid file extension.';
             }
-            //validate file size
             if ($size / 1024 / 1024 > 2) {
                 $valid = false;
                 $response = 'File size is exceeding maximum allowed size.';
             }
-            //upload file
             if ($valid) {
                 $targetPath = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sql' . DIRECTORY_SEPARATOR . $name;
                 move_uploaded_file($tmpName, $targetPath);
+                $_SESSION["sqlfile"] = $name;
                 header('Location: database.php');
                 exit;
             }
