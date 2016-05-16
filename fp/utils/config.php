@@ -1,7 +1,8 @@
 <?php
-$database_host = "localhost";
-$database_user = "root";
-$database_pass = "";
-$database_name = "temporaryWebServer";
-$table_prefix = "";
-?>
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+//include_once ('utils/config.php');
+// Create connection
+$conn = new mysqli($servername, $username, $password);

@@ -1,16 +1,12 @@
-<?php
-include 'utils/config.php';
-?>
 <!DOCTYPE html>
 <head id="head">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Temporary Web Server</title>
     <script src="main.js"></script>
-
+<div>
+    <h5><a href="database.php">Create Database </a>
+</div>
     <style type='text/css'>
-        @import url(http://fonts.googleapis.com/css?family=Questrial);
-
-
         #holder {
             font-family: Arial;
             width: 500px;
