@@ -87,8 +87,8 @@ $conn->close();
                         <label for="">Database Name</label>
                         <input name="dbname" type="text" class="form-control" placeholder="Databae Name" required>
                         <label for=""><?php
-echo $import_success;
-?>
+                            echo $import_success;
+                            ?>
                         </label>
                     </div>
 

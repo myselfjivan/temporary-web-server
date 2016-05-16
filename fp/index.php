@@ -13,10 +13,16 @@ include 'header.php';
 <body>
     <div class="container">
         <div class="row">
-            <h1>Select the Folder to upload to server</h1>
-            <div id="holder">
-                <input type="file" id="files" name="files[]" multiple="" webkitdirectory="">​
-                <div id="output"></div>
+            <div class="col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h1>Select the Application Directory to upload to server</h1>
+                        <div id="holder">
+                            <input type="file" id="files" name="files[]" multiple="" webkitdirectory="">​
+                            <div id="output"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -29,14 +35,16 @@ include 'header.php';
                     </div>
                     <div class="panel-body">
                         <ul>
-                            <li>1.If you have static site, upload it here.</li>
-                            <li>2.If you have dynamic application, first off all create database configuration <a href="database.php">here</a></li>
+                            <li>1. If you have static Application, upload it <a href="index.php">here.</a></li>
+                            <li>2. If you have dynamic application, first off all create database configuration <a href="database.php">here.</a></li>
+                            <li>3. Make all the directory readable to browser.</li>
+
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
-        <h2>Available Sites</h2>
+        <h2>All Available Sites</h2>
         <?php
         $directory = "uploads/";
 
@@ -55,7 +63,7 @@ include 'header.php';
                 $tempUrl = str_replace("uploads/", "", $file);
 
 
-                echo "<br><a href=http://192.168.90.131/temporaryWebServer/fp/uploads/" . rawurlencode($tempUrl) . " target=_blank>" . $tempUrl . "</a>";
+                echo "<br><a href=http://localhost/temporaryWebServer/fp/uploads/" . rawurlencode($tempUrl) . " target=_blank>" . $tempUrl . "</a>";
             }
         }
         ?>
